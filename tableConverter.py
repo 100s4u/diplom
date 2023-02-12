@@ -14,27 +14,34 @@ def getListsFromFile():
     
 def saveTimetableToFile(timetables):
     wb = Workbook()
-    ws = wb.create_sheet('Test')
 
     for timetable in timetables:
+        ws = wb.create_sheet(timetable)
+
+        ws.column_dimensions['A'].width = 50
+        ws.column_dimensions['B'].width = 50
+        ws.column_dimensions['C'].width = 50
+        ws.column_dimensions['D'].width = 50
+        ws.column_dimensions['E'].width = 50
+
         timetable = timetables[timetable]
-        ws.cell(row=1,column=5).value = 'Нечётная неделя' 
-        for idx, day in enumerate(timetable['odd']):
-            for i, lesson in enumerate(day):
-                if lesson == '':
-                    continue
-                else:
-                    ws.cell(row=idx+2,column=i+1).value = f'{i+1}. {lesson["lesson"]}'
-        ws.cell(row=1,column=11).value = 'Чётная неделя'
+        ws.cell(row=1,column=1).value = 'Чётная неделя'
         for idx, day in enumerate(timetable['even']):
             for i, lesson in enumerate(day):
                 if lesson == '':
                     continue
                 else:
-                    ws.cell(row=idx+15,column=i+1).value = f'{i+1}. {lesson["lesson"]}'
+                    ws.cell(row=i+2,column=idx+1).value = f'{i+1}. {lesson["lesson"]}'
+        ws.cell(row=14,column=1).value = 'Чётная неделя'
+        for idx, day in enumerate(timetable['odd']):
+            for i, lesson in enumerate(day):
+                if lesson == '':
+                    continue
+                else:
+                    ws.cell(row=i+15,column=idx+1).value = f'{i+1}. {lesson["lesson"]}'
     
     del wb['Sheet']
-    wb.save("sample.xlsx")
+    wb.save("result.xlsx")
     wb.close()
 
 def select_list(file):
