@@ -4,12 +4,12 @@ import timetableCreator
 
 def main():
     # DEBUG
-    sys.argv.append( '.\Задание на ВКР.xls' )
+    sys.argv.append( '.\start_file.xls' )
 
-    selected_list = tableConverter.getListFromFile()
+    selected_lists = tableConverter.getListsFromFile()
 
     # формируем расписания
-    timetables = timetableCreator.listToTimetables(selected_list)
+    timetables = timetableCreator.listsToTimetables(selected_lists)
 
     # записываем их в файл
     tableConverter.saveTimetableToFile(timetables)

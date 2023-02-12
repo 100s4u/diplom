@@ -2,16 +2,16 @@ import pandas as pd
 from openpyxl import Workbook
 import sys
 
-def getListFromFile():
+def getListsFromFile():
     # загружаем файл, переданный программе в ее аргументах
     file = load_file()
 
     # просим пользователя выбрать лист для работы программы
-    selected_list = select_list(file)
+    lists = select_list(file)
     # на этом моменте получили целый лист, готовый к парсингу (selected_list)
 
-    return selected_list
-
+    return lists
+    
 def saveTimetableToFile(timetables):
     wb = Workbook()
     ws = wb.create_sheet('Test')
@@ -46,15 +46,25 @@ def select_list(file):
     #     for idx, list_name in enumerate(xl.sheet_names):
     #         print(f"{idx+1}. {list_name}")
     #     selected_list = input("Введите число: ")
-    selected_list = 2
+
+    # лист с парами
+    lessons_list = 1 # второй по счету лист
+    lessons_list = parse_list(file, lessons_list)
+
+    # лист с заказными парами
+    ordered_lessons_list = 2 # третий по счету лист
+    ordered_lessons_list = parse_list(file, ordered_lessons_list)
+
+    return [lessons_list, ordered_lessons_list]
+
+def parse_list(file, selected_list):
     try:
         selected_list = int(selected_list)
-        selected_list -= 1
-        # Загрузить лист в DataFrame по его имени: df1
-        selected_list = file.parse(file.sheet_names[selected_list])
+        # Загрузить лист по его имени
+        return file.parse(file.sheet_names[selected_list])
     except:
         print("Лист некорректен!")
-    return selected_list
+        exit()
 
 def load_file():
     # проверяем наличие переданного файла

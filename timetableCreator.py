@@ -1,10 +1,11 @@
-def listToTimetables(selected_list):
+def listsToTimetables(lists):
+    [lessons_list, ordered_lessons_list] = lists
     # парсим лист в список пар
-    lessons = list_to_lessons(selected_list)
+    lessons = list_to_lessons(lessons_list)
     # формируем расписание
-    return lessons_to_timetables(lessons)
+    return lessons_to_timetables(lessons, ordered_lessons_list)
 
-def lessons_to_timetables(lessons):
+def lessons_to_timetables(lessons, ordered_lessons):
     timetables = {} # массив расписаний, 1 элемент - 1 расписание для группы
 
     # формируем список групп в timetables
@@ -58,7 +59,7 @@ def fill_timetable(timetables, group, week_lessons):
         # проверяем, что на эту пару не установлена другая
         if timetables[group][week][day][lesson_num] == '':
             # проверяем свободен ли урок
-            if is_lesson_free(timetables, lesson['lesson'], week == 'even', day, lesson_num, lesson['teacher']):
+            if is_lesson_free(timetables, lesson, week == 'even', day, lesson_num, lesson['teacher']):
                 # размещение пары на своем месте
                 timetables[group][week][day][lesson_num] = lesson
 
@@ -94,22 +95,35 @@ def get_lessons_of_group(lessons, target_group):
     return result
 
 # функция проверяет, свободен ли определенный предмет на конкретную неделю на конкретной паре
-def is_lesson_free(timetables, lesson_name, is_week_even, day, lesson_num, teacher_name = '') -> bool:
-    # проходимся по всем расписаниям
+def is_lesson_free(timetables, lesson, is_week_even, day, lesson_num, teacher_name = '') -> bool:
+    if is_week_even:
+        week = 'even'
+    else:
+        week = 'odd'
+    # проверяем что пара не занята
     for timetable in timetables:
         timetable = timetables[timetable]
-        if is_week_even:
-            week = 'even'
-        else:
-            week = 'odd'
         try:
             # если эта пара уже занята
-            if timetable[week][day][lesson_num]['lesson'] == lesson_name:
+            if timetable[week][day][lesson_num]['lesson'] == lesson['lesson']:
                 # проверяем, занята ли она тем же преподом
                 if timetable[week][day][lesson_num]['teacher'] == teacher_name:
                     return False
                 else:
                     continue
+            else:
+                continue
+        except:
+            continue
+    # проверяем что кабинет не занят
+    if lesson['cabinet'] == '':
+        return True
+    for timetable in timetables:
+        timetable = timetables[timetable]
+        # проверяем каждую группу на определенный день определенную пару
+        try:
+            if timetable[week][day][lesson_num]['cabinet'] == lesson['cabinet']:
+                return False
             else:
                 continue
         except:
@@ -140,11 +154,14 @@ def list_to_lessons(lessons_list):
     for i in range(first_row_num, len(table)):
         if str(table[i][0]) == 'nan':
             table[i][0] = ''
+        if str(table[i][6]) == 'nan':
+            table[i][6] = ''
         new_lesson = {
             'teacher': str(table[i][0]),
             'lesson': str(table[i][1]),
             'group': str(table[i][2]),
-            'hours': int(table[i][4])
+            'hours': int(table[i][4]),
+            'cabinet': str(table[i][6]),
         }
         lessons.append(new_lesson)
 
