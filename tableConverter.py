@@ -31,14 +31,14 @@ def saveTimetableToFile(timetables):
                 if lesson == '':
                     continue
                 else:
-                    ws.cell(row=i+2,column=idx+1).value = f'{i+1}. {lesson["lesson"]}'
+                    ws.cell(row=i+2,column=idx+1).value = f'{i+1}. {lesson["lesson"]} / {lesson["teacher"]}'
         ws.cell(row=14,column=1).value = 'Чётная неделя'
         for idx, day in enumerate(timetable['odd']):
             for i, lesson in enumerate(day):
                 if lesson == '':
                     continue
                 else:
-                    ws.cell(row=i+15,column=idx+1).value = f'{i+1}. {lesson["lesson"]}'
+                    ws.cell(row=i+15,column=idx+1).value = f'{i+1}. {lesson["lesson"]} / {lesson["teacher"]}'
     
     del wb['Sheet']
     wb.save("result.xlsx")

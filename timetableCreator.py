@@ -2,6 +2,8 @@ def listsToTimetables(lists):
     [lessons_list, ordered_lessons_list] = lists
     # парсим лист в список пар
     lessons = list_to_lessons(lessons_list)
+    # парсим заказные пары
+    ordered_lessons_list = ordered_lessons_list_parse(ordered_lessons_list)
     # формируем расписание
     return lessons_to_timetables(lessons, ordered_lessons_list)
 
@@ -27,8 +29,6 @@ def lessons_to_timetables(lessons, ordered_lessons):
                 for i in range(20):
                     day.append('')
     
-    # создаем массив пар, которые не удалось установить
-    failed_lessons = []
     # работаем отдельно по каждой группе
     for group in timetables.keys():
         week = 'even' # начинаем с четной недели
@@ -37,7 +37,7 @@ def lessons_to_timetables(lessons, ordered_lessons):
         lessons_of_group = get_lessons_of_group(lessons, group)
 
         # формируем расписание
-        fill_timetable(timetables, group, lessons_of_group)
+        fill_timetable(timetables, group, lessons_of_group, ordered_lessons)
     
     return timetables
 
@@ -48,34 +48,12 @@ def lessons_to_timetables(lessons, ordered_lessons):
 3. Перейти на следующий день
 Повторять пока не кончатся пары
 '''
-def fill_timetable(timetables, group, week_lessons):
+def fill_timetable(timetables, group, week_lessons, ordered_lessons):
     day = 0 # начинаем с понедельника
     lesson_num = 0 # начинаем с 1 пары
     week = 'even' #  начинаем с четной недели
 
     while len(week_lessons) > 0:
-        lesson = week_lessons[0]
-
-        # проверяем, что на эту пару не установлена другая
-        if timetables[group][week][day][lesson_num] == '':
-            # проверяем свободен ли урок
-            if is_lesson_free(timetables, lesson, week == 'even', day, lesson_num, lesson['teacher']):
-                # размещение пары на своем месте
-                timetables[group][week][day][lesson_num] = lesson
-
-                # удаляем пару из week_lessons
-                if (lesson['hours'] < 2):
-                    week_lessons.remove(lesson)
-                else:
-                    lesson['hours'] -= 1
-
-                # возвращаемся на первую пару первого дня
-                day = 0
-                lesson_num = 0
-            else:
-                # пробуем поставить в другое место
-                day += 1
-        
         day += 1
         if (day >= 5):
             if (week == 'even'):
@@ -85,6 +63,44 @@ def fill_timetable(timetables, group, week_lessons):
                 week = 'even'
                 day = 0
                 lesson_num += 1
+                if (lesson_num == 8):
+                    # пару поставить не удалось
+                    # удаляем пару из week_lessons
+                    if (lesson['hours'] < 2):
+                        week_lessons.remove(lesson)
+                    else:
+                        lesson['hours'] -= 1
+                    # возвращаемся на первую пару первого дня
+                    day = 0
+                    lesson_num = 0
+                    continue
+
+        lesson = week_lessons[0]
+
+        # проверяем, что на эту пару не установлена другая
+        if timetables[group][week][day][lesson_num] != '':
+            continue
+
+        # проверяем, что препод может вести эту пару в этот день
+        if lesson['teacher'] in ordered_lessons:
+            if ordered_lessons[lesson['teacher']][day][lesson_num] == False:
+                continue
+
+        # проверяем свободен ли урок
+        if not is_lesson_free(timetables, lesson, week == 'even', day, lesson_num, lesson['teacher']):
+            continue
+
+        # ура, можем ставить сюда пару
+        # размещение пары на своем месте
+        timetables[group][week][day][lesson_num] = lesson
+        # удаляем пару из week_lessons
+        if (lesson['hours'] < 2):
+            week_lessons.remove(lesson)
+        else:
+            lesson['hours'] -= 1
+        # возвращаемся на первую пару первого дня
+        day = 0
+        lesson_num = 0
 
 # из списка общего списка занятий возвращает занатия только для определенной группы
 def get_lessons_of_group(lessons, target_group):
@@ -130,10 +146,6 @@ def is_lesson_free(timetables, lesson, is_week_even, day, lesson_num, teacher_na
             continue
     return True
 
-# функция проверяет, свободена конкретная пара, т.е. можно ли туда вотнкуть пару или она занята
-#def is_lesson_free2():
-#    timetables[group][week][day][lesson_num]
-
 def list_to_lessons(lessons_list):
     # забираем значения таблицы
     table = lessons_list.values
@@ -166,3 +178,46 @@ def list_to_lessons(lessons_list):
         lessons.append(new_lesson)
 
     return lessons
+    
+def ordered_lessons_list_parse(ordered_lessons_list):
+    # забираем значения таблицы
+    table = ordered_lessons_list.values
+
+    # ищем номер первой строки с нормером пары
+    first_row_num = None
+    for idx, row in enumerate(table):
+        temp = str(row[2])
+        is_nan = temp == 'nan'
+        if is_nan:
+            continue
+        if temp.isnumeric():
+            first_row_num = idx
+            break
+
+    # нашли первую строчку с фамилией препода, парсим заказные пары
+    teachers = []
+    result = {}
+    i = first_row_num
+    while True:
+        try:
+            teacher_name = table[i][0]
+        except:
+            break
+        if str(teacher_name) == 'nan':
+            break
+        teachers.append(teacher_name)
+        result[teacher_name] = parse_x_marks(table, i)
+        i += 7
+
+    return result
+
+def parse_x_marks(table, pos):
+    result = []
+    for i in range(6):
+        result.append([])
+        for j in range(8):
+            if table[pos+1+i][2+j] == 'x' or table[pos+1+i][2+j] == 'х':
+                result[i].append(True)
+            else:       
+                result[i].append(False)
+    return result
