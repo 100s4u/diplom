@@ -65,6 +65,7 @@ def fill_timetable(timetables, group, week_lessons, ordered_lessons):
                 lesson_num += 1
                 if (lesson_num == 8):
                     # пару поставить не удалось
+                    print(f"Пару поставить не удалось: {lesson['lesson']}, {lesson['teacher']}")
                     # удаляем пару из week_lessons
                     if (lesson['hours'] < 2):
                         week_lessons.remove(lesson)
