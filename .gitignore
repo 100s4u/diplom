@@ -3,4 +3,4 @@ __pycache__/
 *.xls
 *.xlsx
 *.txt
--requirements.txt
+!requirements.txt
