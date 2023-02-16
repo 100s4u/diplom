@@ -12,7 +12,7 @@ def main():
     timetables = timetableCreator.listsToTimetables(selected_lists)
 
     # записываем их в файл
-    tableConverter.saveTimetableToFile(timetables)
+    tableConverter.saveTimetableToFile(timetables) 
 
     # DEBUG
     f = open("result.txt", "w")
