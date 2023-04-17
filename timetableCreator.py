@@ -9,6 +9,7 @@ def listsToTimetables(lists):
 
 def lessons_to_timetables(lessons, ordered_lessons):
     timetables = {} # массив расписаний, 1 элемент - 1 расписание для группы
+    failed_lessons = []
 
     # формируем список групп в timetables
     for lesson in lessons:
@@ -37,9 +38,9 @@ def lessons_to_timetables(lessons, ordered_lessons):
         lessons_of_group = get_lessons_of_group(lessons, group)
 
         # формируем расписание
-        fill_timetable(timetables, group, lessons_of_group, ordered_lessons)
+        fill_timetable(timetables, group, lessons_of_group, ordered_lessons, failed_lessons)
     
-    return timetables
+    return timetables, failed_lessons
 
 '''
 Алгоритм заполнения расписания:
@@ -48,7 +49,7 @@ def lessons_to_timetables(lessons, ordered_lessons):
 3. Перейти на следующий день
 Повторять пока не кончатся пары
 '''
-def fill_timetable(timetables, group, week_lessons, ordered_lessons):
+def fill_timetable(timetables, group, week_lessons, ordered_lessons, failed_lessons):
     day = 0 # начинаем с понедельника
     lesson_num = 0 # начинаем с 1 пары
     week = 'even' #  начинаем с четной недели
@@ -66,6 +67,15 @@ def fill_timetable(timetables, group, week_lessons, ordered_lessons):
                 if (lesson_num == 8):
                     # пару поставить не удалось
                     print(f"Пару поставить не удалось: {lesson['lesson']}, {lesson['teacher']}")
+
+                    failed_lesson = {}
+                    failed_lesson['group'] = group
+                    failed_lesson['lesson'] = lesson['lesson']
+                    failed_lesson['teacher'] = lesson['teacher']
+                    failed_lesson['hours'] = lesson['hours']
+                    failed_lesson['cabinet'] = lesson['cabinet']
+                    failed_lessons.append(failed_lesson)
+
                     # удаляем пару из week_lessons
                     if (lesson['hours'] < 2):
                         week_lessons.remove(lesson)
@@ -133,7 +143,7 @@ def is_lesson_free(timetables, lesson, is_week_even, day, lesson_num, teacher_na
         except:
             continue
     # проверяем что кабинет не занят
-    if lesson['cabinet'] == '':
+    if lesson['cabinet'] == '' or lesson['cabinet'] == '100/А':
         return True
     for timetable in timetables:
         timetable = timetables[timetable]
@@ -218,7 +228,7 @@ def parse_x_marks(table, pos):
         result.append([])
         for j in range(8):
             if table[pos+1+i][2+j] == 'x' or table[pos+1+i][2+j] == 'х':
-                result[i].append(True)
-            else:       
                 result[i].append(False)
+            else:       
+                result[i].append(True)
     return result

@@ -1,6 +1,7 @@
 import pandas as pd
 from openpyxl import Workbook
 import sys
+import json
 
 def getListsFromFile():
     # загружаем файл, переданный программе в ее аргументах
@@ -43,6 +44,12 @@ def saveTimetableToFile(timetables):
     del wb['Sheet']
     wb.save("result.xlsx")
     wb.close()
+    
+def saveTimetableToJson(timetables, failed_lessons):
+    result = {}
+    result['timetables'] = timetables
+    result['failed_lessons'] = failed_lessons
+    return json.dumps(result)
 
 def select_list(file):
     # ввод листа от пользователя

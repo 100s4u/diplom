@@ -9,10 +9,17 @@ def main():
     selected_lists = tableConverter.getListsFromFile()
 
     # формируем расписания
-    timetables = timetableCreator.listsToTimetables(selected_lists)
+    timetables, failed_lessons = timetableCreator.listsToTimetables(selected_lists)
+
+    timetables_json = tableConverter.saveTimetableToJson(timetables, failed_lessons)
+
+    with open('json_data.json', 'w') as outfile:
+        outfile.write(timetables_json)
+    
+    #print(timetables_json)
 
     # записываем их в файл
-    tableConverter.saveTimetableToFile(timetables) 
+    #tableConverter.saveTimetableToFile(timetables) 
 
     # DEBUG
     f = open("result.txt", "w")
