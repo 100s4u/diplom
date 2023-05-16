@@ -32,14 +32,14 @@ def saveTimetableToFile(timetables):
                 if lesson == '':
                     continue
                 else:
-                    ws.cell(row=i+2,column=idx+1).value = f'{i+1}. {lesson["lesson"]} / {lesson["teacher"]}'
+                    ws.cell(row=i+2,column=idx+1).value = f'{i+1}. {lesson["lesson"]} / {lesson["teacher"]} / {lesson["cabinet"]}'
         ws.cell(row=14,column=1).value = 'Чётная неделя'
         for idx, day in enumerate(timetable['odd']):
             for i, lesson in enumerate(day):
                 if lesson == '':
                     continue
                 else:
-                    ws.cell(row=i+15,column=idx+1).value = f'{i+1}. {lesson["lesson"]} / {lesson["teacher"]}'
+                    ws.cell(row=i+15,column=idx+1).value = f'{i+1}. {lesson["lesson"]} / {lesson["teacher"]} / {lesson["cabinet"]}'
     
     del wb['Sheet']
     wb.save("result.xlsx")
@@ -61,6 +61,10 @@ def select_list(file):
     #         print(f"{idx+1}. {list_name}")
     #     selected_list = input("Введите число: ")
 
+    # лист с кабинетами
+    cabinets_list = 0 # первый по счету лист
+    cabinets_list = parse_list(file, cabinets_list)
+
     # лист с парами
     lessons_list = 1 # второй по счету лист
     lessons_list = parse_list(file, lessons_list)
@@ -69,7 +73,7 @@ def select_list(file):
     ordered_lessons_list = 2 # третий по счету лист
     ordered_lessons_list = parse_list(file, ordered_lessons_list)
 
-    return [lessons_list, ordered_lessons_list]
+    return [cabinets_list, lessons_list, ordered_lessons_list]
 
 def parse_list(file, selected_list):
     try:
