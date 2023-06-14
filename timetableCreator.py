@@ -50,7 +50,7 @@ def lessons_to_timetables(cabinets, lessons, ordered_lessons):
             for day_num, day in enumerate(week):
                 for lesson_num, lesson in enumerate(day):
                     if (lesson == ''): continue # не добавляем кабинет если нет пары
-                    if (lesson == ''): continue # не добавляем кабинет если он уже добавлен
+                    if (lesson['cabinet'] != ''): continue # не добавляем кабинет если он уже добавлен
                     # ищем свободный кабинет
                     free_cabinet = find_free_cabinet(cabinets, timetables, week_name, day_num, lesson_num)
                     if (free_cabinet == None): free_cabinet = "НЕ НАЙДЕН"
