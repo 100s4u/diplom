@@ -1,8 +1,9 @@
 import sys
 import tableConverter
 import timetableCreator
+import result_table_creator
 
-def main():
+def generate():
     # DEBUG
     sys.argv.append( '.\start_file.xls' )
 
@@ -21,7 +22,8 @@ def main():
     #print(timetables_json)
 
     # записываем их в файл
-    tableConverter.saveTimetableToFile(timetables) 
+    result_table_creator.main()
+    # tableConverter.saveTimetableToFile(timetables) 
 
     # DEBUG
     f = open("result.txt", "w")
@@ -29,4 +31,4 @@ def main():
     f.close()
 
 if __name__ == '__main__':
-    main()
+    generate()

@@ -5,6 +5,9 @@ import sys
 import json
 from copy import copy
 
+
+jsonData = './build/json_data.json'
+
 def copy_sheet(source_sheet, target_sheet):
     copy_cells(source_sheet, target_sheet)  # copy all the cel values and styles
     copy_sheet_attributes(source_sheet, target_sheet)
@@ -80,6 +83,9 @@ def saveJsonToFile(timetables):
 
         timetable = timetables[timetable_name]
         day_shift = 3
+
+        target_sheet.cell(row=day_shift,column=1).value = timetable_name
+        # target_sheet.cell(row=day_shift+lesson_shift,column=2+1).value = i+1
         for idx, day in enumerate(timetable['odd']):
             lesson_shift = 0
             for i, lesson in enumerate(day):
@@ -91,7 +97,7 @@ def saveJsonToFile(timetables):
                     # записываем предмет
                     target_sheet.cell(row=day_shift+lesson_shift,column=2+2).value = lesson["lesson"]
                     # записываем Тип зан.
-                    source_sheet.cell(row=day_shift+lesson_shift,column=2+4).value = 'лек'
+                    target_sheet.cell(row=day_shift+lesson_shift,column=2+4).value = 'лек'
                     # записываем преподавателя
                     target_sheet.cell(row=day_shift+lesson_shift,column=2+5).value = lesson["teacher"]
                     # записываем аудиторию
@@ -110,7 +116,7 @@ def saveJsonToFile(timetables):
                     # записываем предмет
                     target_sheet.cell(row=day_shift+lesson_shift,column=9+2).value = lesson["lesson"]
                     # записываем Тип зан.
-                    source_sheet.cell(row=day_shift+lesson_shift,column=9+4).value = 'лек'
+                    target_sheet.cell(row=day_shift+lesson_shift,column=9+4).value = 'лек'
                     # записываем преподавателя
                     target_sheet.cell(row=day_shift+lesson_shift,column=9+5).value = lesson["teacher"]
                     # записываем аудиторию
@@ -144,7 +150,7 @@ def load_file(in_file):
     return file
 
 def main():
-    data = loadTimetableFromJsonFile('json_data.json')
+    data = loadTimetableFromJsonFile(jsonData)
     timetables = data['timetables']
     failed_lessons = data['failed_lessons']
     saveJsonToFile(timetables)
