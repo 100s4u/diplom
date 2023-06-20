@@ -14,7 +14,7 @@ startFile = './start_file.xls'
 
 
 def generate(file):
-    # DEBUG
+    # DEBUG 
     sys.argv.append(file)
 
     selected_lists = tableConverter.getListsFromFile()

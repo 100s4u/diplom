@@ -4,7 +4,7 @@ import timetableCreator
 import result_table_creator
 
 def generate():
-    # DEBUG
+    # DEBUG 
     sys.argv.append( '.\start_file.xls' )
 
     selected_lists = tableConverter.getListsFromFile()
