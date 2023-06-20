@@ -6,7 +6,7 @@ import json
 from copy import copy
 
 
-jsonData = './build/json_data.json' 
+jsonData = './build/json_data.json'
 
 def copy_sheet(source_sheet, target_sheet):
     copy_cells(source_sheet, target_sheet)  # copy all the cel values and styles
