@@ -8,6 +8,11 @@ from copy import copy
 
 
 jsonData = './build/json_data.json' 
+resultPath = "C:\\Users\\"+getpass.getuser()+"\\Documents\\Расписание_Занятий\\"
+
+# проверка наличия пути с результатами и его созадние, если нет
+if(not os.path.exists(resultPath)):
+    os.mkdir(resultPath)
 
 def copy_sheet(source_sheet, target_sheet):
     copy_cells(source_sheet, target_sheet)  # copy all the cel values and styles
