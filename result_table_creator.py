@@ -1,12 +1,13 @@
 import pandas as pd
 from openpyxl import Workbook
 import openpyxl
-import sys
+import os
+import getpass
 import json
 from copy import copy
 
 
-jsonData = './build/json_data.json'
+jsonData = './build/json_data.json' 
 
 def copy_sheet(source_sheet, target_sheet):
     copy_cells(source_sheet, target_sheet)  # copy all the cel values and styles
@@ -58,75 +59,156 @@ def copy_cells(source_sheet, target_sheet):
         if source_cell.comment:
             target_cell.comment = copy(source_cell.comment)
 
-def saveJsonToFile(timetables):
-    # загружаем template лист
-    # template = parse_list(load_file('template.xls'), 0)
+def saveJsonToFile(timetables, file_name):
+    if (file_name == "timetables.xlsx"):
+        # загружаем template лист
+        # template = parse_list(load_file('template.xls'), 0)
 
-    # создаем новый Workbook
-    wb_target = openpyxl.Workbook()
+        # создаем новый Workbook
+        wb_target = openpyxl.Workbook()
 
-    #test = template.values[pointer_x][pointer_y]
+        #test = template.values[pointer_x][pointer_y]
 
-    for timetable_name in timetables:
-        target_sheet = wb_target.create_sheet(timetable_name)
+        for timetable_name in timetables:
+            target_sheet = wb_target.create_sheet(timetable_name)
 
-        wb_source = openpyxl.load_workbook("template.xlsx", data_only=True)
-        source_sheet = wb_source["template"]
+            wb_source = openpyxl.load_workbook("template.xlsx", data_only=True)
+            source_sheet = wb_source["template"]
 
-        copy_sheet(source_sheet, target_sheet)
+            copy_sheet(source_sheet, target_sheet)
 
-        # ws.column_dimensions['A'].width = 50
-        # ws.column_dimensions['B'].width = 50
-        # ws.column_dimensions['C'].width = 50
-        # ws.column_dimensions['D'].width = 50
-        # ws.column_dimensions['E'].width = 50
+            # ws.column_dimensions['A'].width = 50
+            # ws.column_dimensions['B'].width = 50
+            # ws.column_dimensions['C'].width = 50
+            # ws.column_dimensions['D'].width = 50
+            # ws.column_dimensions['E'].width = 50
 
-        timetable = timetables[timetable_name]
-        day_shift = 3
+            timetable = timetables[timetable_name]
+            day_shift = 3
 
-        target_sheet.cell(row=day_shift,column=1).value = timetable_name
-        # target_sheet.cell(row=day_shift+lesson_shift,column=2+1).value = i+1
-        for idx, day in enumerate(timetable['odd']):
-            lesson_shift = 0
-            for i, lesson in enumerate(day):
-                if lesson == '':
-                    continue
-                else:
-                    # записываем номер пары
-                    target_sheet.cell(row=day_shift+lesson_shift,column=2+1).value = i+1
-                    # записываем предмет
-                    target_sheet.cell(row=day_shift+lesson_shift,column=2+2).value = lesson["lesson"]
-                    # записываем Тип зан.
-                    target_sheet.cell(row=day_shift+lesson_shift,column=2+4).value = 'лек'
-                    # записываем преподавателя
-                    target_sheet.cell(row=day_shift+lesson_shift,column=2+5).value = lesson["teacher"]
-                    # записываем аудиторию
-                    target_sheet.cell(row=day_shift+lesson_shift,column=2+6).value = lesson["cabinet"]
-                    lesson_shift += 1
-            day_shift += 6 # сдвигаемся на следующий день
-        day_shift = 3
-        for idx, day in enumerate(timetable['even']):
-            lesson_shift = 0
-            for i, lesson in enumerate(day):
-                if lesson == '':
-                    continue
-                else:
-                    # записываем номер пары
-                    target_sheet.cell(row=day_shift+lesson_shift,column=9+1).value = i+1
-                    # записываем предмет
-                    target_sheet.cell(row=day_shift+lesson_shift,column=9+2).value = lesson["lesson"]
-                    # записываем Тип зан.
-                    target_sheet.cell(row=day_shift+lesson_shift,column=9+4).value = 'лек'
-                    # записываем преподавателя
-                    target_sheet.cell(row=day_shift+lesson_shift,column=9+5).value = lesson["teacher"]
-                    # записываем аудиторию
-                    target_sheet.cell(row=day_shift+lesson_shift,column=9+6).value = lesson["cabinet"]
-                    lesson_shift += 1
-            day_shift += 6 # сдвигаемся на следующий день
+            target_sheet.cell(row=day_shift,column=1).value = timetable_name
+            # target_sheet.cell(row=day_shift+lesson_shift,column=2+1).value = i+1
+            for idx, day in enumerate(timetable['odd']):
+                lesson_shift = 0
+                for i, lesson in enumerate(day):
+                    if lesson == '':
+                        continue
+                    else:
+                        # записываем номер пары
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+1).value = i+1
+                        # записываем предмет
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+2).value = lesson["lesson"]
+                        # записываем Тип зан.
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+4).value = 'лек'
+                        # записываем преподавателя
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+5).value = lesson["teacher"]
+                        # записываем аудиторию
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+6).value = lesson["cabinet"]
+                        lesson_shift += 1
+                day_shift += 6 # сдвигаемся на следующий день
+            day_shift = 3
+            for idx, day in enumerate(timetable['even']):
+                lesson_shift = 0
+                for i, lesson in enumerate(day):
+                    if lesson == '':
+                        continue
+                    else:
+                        # записываем номер пары
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+1).value = i+1
+                        # записываем предмет
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+2).value = lesson["lesson"]
+                        # записываем Тип зан.
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+4).value = 'лек'
+                        # записываем преподавателя
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+5).value = lesson["teacher"]
+                        # записываем аудиторию
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+6).value = lesson["cabinet"]
+                        lesson_shift += 1
+                day_shift += 6 # сдвигаемся на следующий день
 
-    del wb_target['Sheet']
-    wb_target.save("result.xlsx")
-    wb_target.close()
+        del wb_target['Sheet']
+        wb_target.save(resultPath+file_name)
+        wb_target.close()
+    if (file_name == "teachers.xlsx"):
+        wb_target = openpyxl.Workbook()
+        for timetable_name in timetables:
+            target_sheet = wb_target.create_sheet(timetable_name)
+            wb_source = openpyxl.load_workbook("templateT.xlsx", data_only=True)
+            source_sheet = wb_source["template"]
+            copy_sheet(source_sheet, target_sheet)
+            timetable = timetables[timetable_name]
+            day_shift = 3
+            target_sheet.cell(row=day_shift,column=1).value = timetable_name
+            for day in timetable['odd']:
+                lesson_shift = 0
+                for i, lesson in enumerate(timetable['odd'][day]):
+                    if not(day in timetables[timetable_name]['odd'] and lesson in timetables[timetable_name]['odd'][day]):
+                        continue
+                    else:
+                        lesson_shift = int(lesson)
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+1).value = int(lesson)+1
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+2).value = timetables[timetable_name]['odd'][day][lesson]["lesson"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+4).value = 'лек'
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+5).value = timetables[timetable_name]['odd'][day][lesson]["group"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+6).value = timetables[timetable_name]['odd'][day][lesson]["cabinet"]
+                day_shift += 6
+            day_shift = 3
+            for day in timetable['even']:
+                lesson_shift = 0
+                for i, lesson in enumerate(timetable['even'][day]):
+                    if not(day in timetables[timetable_name]['even'] and lesson in timetables[timetable_name]['even'][day]):
+                        continue
+                    else:
+                        lesson_shift = int(lesson)
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+1).value = int(lesson)+1
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+2).value = timetables[timetable_name]['even'][day][lesson]["lesson"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+4).value = 'лек'
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+5).value = timetables[timetable_name]['even'][day][lesson]["group"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+6).value = timetables[timetable_name]['even'][day][lesson]["cabinet"]
+                day_shift += 6
+        del wb_target['Sheet']
+        wb_target.save(resultPath+file_name)
+        wb_target.close()
+    if (file_name == "audiences.xlsx"):
+        wb_target = openpyxl.Workbook()
+        for timetable_name in timetables:
+            target_sheet = wb_target.create_sheet(timetable_name.replace('/', ' '))
+            wb_source = openpyxl.load_workbook("templateA.xlsx", data_only=True)
+            source_sheet = wb_source["template"]
+            copy_sheet(source_sheet, target_sheet)
+            timetable = timetables[timetable_name]
+            day_shift = 3
+            target_sheet.cell(row=day_shift,column=1).value = timetable_name
+            for day in timetable['odd']:
+                lesson_shift = 0
+                for i, lesson in enumerate(timetable['odd'][day]):
+                    if not(day in timetables[timetable_name]['odd'] and lesson in timetables[timetable_name]['odd'][day]):
+                        continue
+                    else:
+                        lesson_shift = int(lesson)
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+1).value = int(lesson)+1
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+2).value = timetables[timetable_name]['odd'][day][lesson]["lesson"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+4).value = 'лек'
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+5).value = timetables[timetable_name]['odd'][day][lesson]["group"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=2+6).value = timetables[timetable_name]['odd'][day][lesson]["cabinet"]
+                day_shift += 6
+            day_shift = 3
+            for day in timetable['even']:
+                lesson_shift = 0
+                for i, lesson in enumerate(timetable['even'][day]):
+                    if not(day in timetables[timetable_name]['even'] and lesson in timetables[timetable_name]['even'][day]):
+                        continue
+                    else:
+                        lesson_shift = int(lesson)
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+1).value = int(lesson)+1
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+2).value = timetables[timetable_name]['even'][day][lesson]["lesson"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+4).value = 'лек'
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+5).value = timetables[timetable_name]['even'][day][lesson]["group"]
+                        target_sheet.cell(row=day_shift+lesson_shift,column=9+6).value = timetables[timetable_name]['even'][day][lesson]["cabinet"]
+                day_shift += 6
+        del wb_target['Sheet']
+        wb_target.save(resultPath+file_name)
+        wb_target.close()
     
 def loadTimetableFromJsonFile(filename):
     file = open(filename)
@@ -152,8 +234,11 @@ def load_file(in_file):
 def main():
     data = loadTimetableFromJsonFile(jsonData)
     timetables = data['timetables']
-    failed_lessons = data['failed_lessons']
-    saveJsonToFile(timetables)
+    teachers_timetables = data['teachers_timetables']
+    cabinets_timetables = data['cabinets_timetables']
+    saveJsonToFile(cabinets_timetables, "audiences.xlsx")
+    saveJsonToFile(teachers_timetables, "teachers.xlsx")
+    saveJsonToFile(timetables, "timetables.xlsx")
 
 if __name__ == '__main__':
     main()

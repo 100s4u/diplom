@@ -10,6 +10,8 @@ def listsToTimetables(lists):
     return lessons_to_timetables(cabinets, lessons, ordered_lessons_list)
 
 def lessons_to_timetables(cabinets, lessons, ordered_lessons):
+    teachers_timetables = {}
+    cabinets_timetables = {}
     timetables = {} # массив расписаний, 1 элемент - 1 расписание для группы
     failed_lessons = []
 
@@ -29,7 +31,7 @@ def lessons_to_timetables(cabinets, lessons, ordered_lessons):
         for week in timetable:
             week = timetable[week]
             for day in week:
-                for i in range(20):
+                for i in range(5):
                     day.append('')
     
     # работаем отдельно по каждой группе
@@ -49,15 +51,20 @@ def lessons_to_timetables(cabinets, lessons, ordered_lessons):
             week = timetable[week_name]
             for day_num, day in enumerate(week):
                 for lesson_num, lesson in enumerate(day):
-                    if (lesson == ''): continue # не добавляем кабинет если нет пары
-                    if (lesson['cabinet'] != ''): continue # не добавляем кабинет если он уже добавлен
-                    # ищем свободный кабинет
-                    free_cabinet = find_free_cabinet(cabinets, timetables, week_name, day_num, lesson_num)
-                    if (free_cabinet == None): free_cabinet = "НЕ НАЙДЕН"
-                    # применяем кабинет
-                    lesson['cabinet'] = free_cabinet
+                    if (lesson == ''): continue # не добавляем ничего если нет пары
+                    if (lesson['cabinet'] == ''): # добавляем кабинет если он не добавлен
+                        # ищем свободный кабинет
+                        free_cabinet = find_free_cabinet(cabinets, timetables, week_name, day_num, lesson_num)
+                        if (free_cabinet == None): free_cabinet = "НЕ НАЙДЕН"
+                        # применяем кабинет
+                        lesson['cabinet'] = free_cabinet
+
+                    # добавление в teachers_timetables
+                    add_lesson_to_alt_timetable(teachers_timetables, lesson['teacher'], week_name, day_num, lesson_num, lesson)
+                    # добавление в cabinets_timetables
+                    add_lesson_to_alt_timetable(cabinets_timetables, lesson['cabinet'], week_name, day_num, lesson_num, lesson)
     
-    return timetables, failed_lessons
+    return timetables, failed_lessons, teachers_timetables, cabinets_timetables
 
 # находит свободный кабинет на определенную пару
 def find_free_cabinet(cabinets, timetables, week_name, day_num, lesson_num):
@@ -108,7 +115,7 @@ def fill_timetable(timetables, group, week_lessons, ordered_lessons, failed_less
                 week = 'even'
                 day = 0
                 lesson_num += 1
-                if (lesson_num == 8):
+                if (lesson_num == 5):
                     # пару поставить не удалось
                     print(f"Пару поставить не удалось: {lesson['lesson']}, {lesson['teacher']}")
 
@@ -144,15 +151,10 @@ def fill_timetable(timetables, group, week_lessons, ordered_lessons, failed_less
         # проверяем свободен ли урок
         if not is_lesson_free(timetables, lesson, week == 'even', day, lesson_num, lesson['teacher']):
             continue
-
-        '''
-        # ищем свободный кабинет под пару
-        if (lesson['cabinet'] != ''): # если кабинет уже указан
-            # проверяем можно ли поставить пару сюда, если нельзя - пропускаем ее
-
-        else: # если кабинет не указан
-            # выбираем кабинет для пары
-        '''
+        
+        # проверяем стоит ли такая же пара до этого
+        if lesson_num != 0 and (timetables[group][week][day][lesson_num-1] != '') and (timetables[group][week][day][lesson_num-1]['lesson'] == lesson['lesson']):
+            continue
 
         # ура, можем ставить сюда пару
         # размещение пары на своем месте
@@ -165,6 +167,16 @@ def fill_timetable(timetables, group, week_lessons, ordered_lessons, failed_less
         # возвращаемся на первую пару первого дня
         day = 0
         lesson_num = 0
+
+def add_lesson_to_alt_timetable(timetable, key, week, day, lesson_num, lesson):
+    if not key in timetable:
+        timetable[key] = {
+            "even": {},
+            "odd": {},
+        }
+    #if (timetable[key][week] == None): timetable[key][week] = {}
+    if (not day in timetable[key][week]): timetable[key][week][day] = {}
+    timetable[key][week][day][lesson_num] = lesson
 
 # из списка общего списка занятий возвращает занатия только для определенной группы
 def get_lessons_of_group(lessons, target_group):

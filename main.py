@@ -20,10 +20,10 @@ def generate(file):
     selected_lists = tableConverter.getListsFromFile()
 
     # формируем расписания
-    timetables, failed_lessons = timetableCreator.listsToTimetables(selected_lists)
+    timetables, failed_lessons, teachers_timetables, cabinets_timetables = timetableCreator.listsToTimetables(selected_lists)
 
     # конвертация расписания в json
-    timetables_json = tableConverter.saveTimetableToJson(timetables, failed_lessons)
+    timetables_json = tableConverter.saveTimetableToJson(timetables, failed_lessons, teachers_timetables, cabinets_timetables)
 
     # запись json'а в файл
     with open(jsonData, 'w') as outfile:

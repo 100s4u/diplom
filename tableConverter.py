@@ -45,10 +45,12 @@ def saveTimetableToFile(timetables):
     wb.save("result.xlsx")
     wb.close()
     
-def saveTimetableToJson(timetables, failed_lessons):
+def saveTimetableToJson(timetables, failed_lessons, teachers_timetables, cabinets_timetables):
     result = {}
     result['timetables'] = timetables
     result['failed_lessons'] = failed_lessons
+    result['teachers_timetables'] = teachers_timetables
+    result['cabinets_timetables'] = cabinets_timetables
     return json.dumps(result)
 
 def select_list(file):
